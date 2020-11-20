@@ -11,15 +11,13 @@ for line in my_file:
         date = elements[0]
         value = elements[1]
  # Aggiungo alla lista dei valori questo valore
-        try:
-            values.append(float(value))
-        except Exception as e:
-            print ("errore, fai schifo\n {}".format(e))
+        values.append(float(value))
 
 print (values)
 def my_list_sum(the_list):
     sum=0
     for item in the_list:
         sum = sum+item
+        print("\t\t\tsomma: {}".format(sum))
     print ("\nLa somma degli shampoo venduti negli ultimi tre anni corrisponde a: {}".format(sum))
 my_list_sum(values)
