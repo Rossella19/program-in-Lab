@@ -8,6 +8,8 @@ class CSVFile:
     def __init__(self, name):
         
         # Setto il nome del file
+        if not isinstance(name, str):
+            raise Exception('messaggio di errore')
         self.name = name
 
 
@@ -69,8 +71,8 @@ class CSVFile:
 # Corpo del programma
 #======================
 
-mio_file = CSVFile(name='shampoo_sales.csv')
+mio_file = CSVFile(name=2)
 
 print('Nome del file: "{}"'.format(mio_file.name))
-print('Dati contenuti nel file: "{}"'.format(mio_file.get_data()))
+#print('Dati contenuti nel file: "{}"'.format(mio_file.get_data()))
 
