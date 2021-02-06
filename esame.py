@@ -1,86 +1,112 @@
-#classe per le eccezioni
+#libreria per estrarre i nomi dei file
+from os import path
+
+
 class ExamException(Exception):
-  pass
-
+    pass
+         
 class CSVTimeSeriesFile:
-  #costruttore, con controllo sul nome del file 
-  def __init__(self, name):
-    try:
-      assert(isinstance(name, str))
-      assert(name != "")
-      self.name = name
-    except:
-      raise ExamException("name not valid")
 
-      
-      #metodo che restituisce la lista di dati
+    #qui controlli di base
+    def __init__(self, name):  
+        
+        # Setto il nome del file
+        if not isinstance(name, str):
+            raise ExamException('Il nome del file deve essere una stringa')
+        #path.exists mi dice se il file con quel nome esiste
+        if not path.exists(name):
+            raise ExamException("Il file che hai indicato non esiste")
 
-  def get_data(self):
-    try:
-      file = open(self.name, "r")
-    except:
-      raise ExamException ("cannot open the file\n")
+#il nome che gli passo diventa l'attributo della classe       
+        self.name = name  
+
+#funzione per la media
+    def mean(self,array):
+        sum=0
+        for el in array:
+            sum=sum+el
+        return (sum/len(array))
+
+
+    def get_data(self):
+       
     
-    time_series=[]
-    #nel file CSV ogni riga è scritta in questo modo: "timestamp, valore numerico"
-    for line in file:
-      try:
-        tmp = line.split(",")
-        assert(len(tmp) ==2)
-        timestamp = int(tmp[0])
-        temperature = float(tmp[1])
-        assert(timestamp >=0)
-        time_series.append([timestamp, temperature])
-      except:
-        print('the line "{}" is not valid'.format(tmp))
-    file.close()
+        try:
+            my_file = open(self.name, 'r')
+        except Exception as e:
+            print('Errore nella lettura del file: "{}"'.format(e))
+            return None  
+            # ad esempio se è file con password o corrotto
 
-    #controllo i timestamp: verifico che siano ordinati e non ci siano doppioni
-    for i in range(1, len(time_series)):
-      if time_series[i-1][0]>=time_series[i][0]:
-        raise ExamException("timestamps are not valid")
-    return time_series
-  
+        #contiene la lista di liste da restituire alla fine di get data
+        response=[] 
+#è =0 perche mi serve per il primissimo confronto per verificare che lordine delle date sia crescente
+#mi stampo le varie temperature nelle ore della giornata  
+        previous_data = 0 
+        for line in my_file:
+            data, valore=line.split(",")
+            # Inizializzo una lista vuota per salvare i valori
+            values = []         
+ 
+            #non lo è la prima riga
+            if data !="epoch" and valore != "temperature": 
+                try:
+                    # fai casting cioe cambio il tipo di avriabile
+                    if valore != "" and valore is not None: 
+                        data=int(data)
+                        valore=float(valore)
+                        if previous_data < data:
+            #se sono in ordine temporale crescente li appende senno no
 
-def daily_stats(time_series):
-  try:
-    assert(isinstance(time_series, list))
-    assert(len(time_series)>0)
-    for i in time_series:
-      assert(isinstance(i, list))
-      assert(len(i) ==2)
-    for i in range(1, len(time_series)):
-      assert(time_series[i][0]>time_series[i-1][0] )
-  except:
-    raise ExamException("time_series is not valid")
-  
-  #qui inserisco le epochs dei giorni (alle 00:00)
-  days_epoch =[]
-  #qui inserisco le temperature, divise per giorno ( days_temperature sarà una lista di liste)
-  days_temperature =[]
-  for data in time_series:
-    day_start_epoch = data[0] - (data[0] % 86400)
-    if day_start_epoch not in days_epoch:
-      #se è la prima temperatura che trovo di un giorno, aggiungo l'epoch a days_epoch
-      days_epoch.append(day_start_epoch)
-      #per risolvere problemi con gli indici di days_temperature aggiungo una lista vuota
-      days_temperature.append([])
-    #qui aggiungo la temperatura nella lista del giorno day_start_epoch a sua volta contenuta in days_temperature
-    days_temperature[days_epoch.index(day_start_epoch)].append(data[1])
-  
-  days_result =[]
-  for day_temperature in days_temperature:
-    days_result.append([min(day_temperature), max(day_temperature), sum(day_temperature)/len(day_temperature)])
-  
-  return days_result
+                            values.append(data)
+                            values.append(valore)
+                            response.append(values)
+                except:
+                    pass
+                previous_data = data  #prendo il valore precedente
 
-try:
-  prova = CSVTimeSeriesFile(name ="data.csv")
+        my_file.close()
+        return response
 
-  data= prova.get_data()
+    def daily_stats(self,time_series): 
+        """
+        La funzione daily_stats prende in ingresso una lista di coppie di valori: [timestamp, misura_temperatura].
+        Restituisce come output:
+            [
+                [valore_min_giorno_1, valore_max_giorno_1, valore_medio_giorno_1],
+                [valore_min_giorno_2, valore_max_giorno_2, valore_medio_giorno_2],
+            ]
+        """
+        response=[]   #lo ridefinisco
+        day=[]        #mi contiene i valori tra ogni giorno
 
-  res=daily_stats(data)
-  for i in res:
-    print (i)
-except ExamException as e:
-  print(e)
+#time_series è quello che restituisce la get data, l'output
+        for i in range(len(time_series)): 
+            date= time_series[i][0]
+            #valore della temperature
+            value= time_series[i][1]  
+            if i < len(time_series) -1:
+                next=time_series[i+1]
+            else:
+                next=[0]   #mi serve per il passaggio successivo
+            if next[0]%86400==0:
+                #array che mi contiene min,max e media
+                stats=[ min(day),max(day),self.mean(day) ] 
+                response.append(stats)
+            #se inizia un nuovo giorno azzaero array day e appendo il valore corrente altrimenti se non è divisbile appendo semplicemente il valore
+            if date % 86400==0:  
+                day=[]
+                day.append(value)
+            else:
+                day.append(value)
+        return response
+
+
+
+
+csv=CSVTimeSeriesFile("date.csv")  #csv è il nome dell'istanza
+time_series=csv.get_data()         #è la lista di liste
+stats=csv.daily_stats(time_series)
+print(stats)
+
+
