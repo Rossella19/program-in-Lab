@@ -1,7 +1,7 @@
 # Inizializzo una lista vuota per salvare i valori
 values = []
 # Apro e leggo il file, linea per linea
-my_file = open("shampoo_sales.csv", "r")
+my_file = open("shampoo_saless.csv", "r")
 for line in my_file:
  # Faccio lo split di ogni riga sulla virgola
     elements = line.split(',')

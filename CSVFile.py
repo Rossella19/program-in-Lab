@@ -1,3 +1,8 @@
+#Create un oggetto CSVFile che rappresenti un file CSV, e che:
+#1) venga inizializzato sul nome del file csv, e
+#2) abbia un attributo “name” che ne contenga il nome
+#3) abbia un metodo “get_data” che torni i dati dal file CSV come
+#    numeri di una lista (come abbiamo già visto).
 
 #======================
 # Classe per file CSV
@@ -71,8 +76,8 @@ class CSVFile:
 # Corpo del programma
 #======================
 
-mio_file = CSVFile(name=2)
+mio_file = CSVFile("shampoo_saless.csv")
 
 print('Nome del file: "{}"'.format(mio_file.name))
-#print('Dati contenuti nel file: "{}"'.format(mio_file.get_data()))
+print('Dati contenuti nel file: "{}"'.format(mio_file.get_data()))
 
