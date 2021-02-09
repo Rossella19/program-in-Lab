@@ -136,7 +136,7 @@ class CSVTimeSeriesFile:
 
 
 #time_series_file è il nome dell'istanza
-time_series_file=CSVTimeSeriesFile("data.csv")  
+time_series_file=CSVTimeSeriesFile(name="data.csv")  
 time_series=time_series_file.get_data()      
 stats=time_series_file.daily_stats(time_series)
 
