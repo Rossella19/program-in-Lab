@@ -69,7 +69,8 @@ class CSVTimeSeriesFile:
                             response.append(values)
                 except:
                     pass
-                    #cosi ogni volta confronto con il precedente per essere sicura che siano in ordine crescente perchè se così non fosse non li appendo e passo avanti, questo me lo fa ogni fine del ciclo
+
+                #cosi ogni volta confronto con il precedente per essere sicura che siano in ordine crescente perchè se così non fosse non li appendo e passo avanti, questo me lo fa ogni fine del ciclo
                 previous_data = data  
                 
         
@@ -138,7 +139,9 @@ class CSVTimeSeriesFile:
 time_series_file=CSVTimeSeriesFile("data.csv")  
 time_series=time_series_file.get_data()      
 stats=time_series_file.daily_stats(time_series)
-print(stats)
 
+#stampo per riga
+for i in stats:
+    print(i)
 
 
